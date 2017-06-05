@@ -1,0 +1,46 @@
+---
+driver:
+  name: docker
+
+driver_config:
+  socket: <%= ENV['DOCKER_HOST'] %>
+  use_cache: true
+  # privileged: true
+  # run_command: bash -c "/usr/bin/dbus-daemon --system --fork && /usr/sbin/sshd -D -o UseDNS=no -o UsePAM=no -o PasswordAuthentication=yes -o UsePrivilegeSeparation=no -o PidFile=/tmp/sshd.pid"
+  # volume:
+  #  - /sys/fs/cgroup:/sys/fs/cgroup:ro
+  provision_command:
+    - yum-config-manager --enable \*satellite*
+    - yum-config-manager --enable \*rhscl*
+    - yum -y install puppet
+    - gem install --no-ri --no-rdoc bundle
+    - sed -i 's/Defaults    secure_path.*//g' /etc/sudoers
+  #  - mkdir /var/run/dbus
+
+provisioner:
+  name: puppet_apply
+  puppet_version: <%= ENV['PUPPET_GEM_VERSION'] %>
+  manifests_path: spec/fixtures/manifests
+  modules_path: spec/fixtures/modules
+
+platforms:
+  - name: rhel
+    driver_config:
+      image: rhel7.2:latest
+
+suites:
+  - name: justice
+    provisioner:
+      manifest: justice.pp
+  - name: general
+    provisioner:
+      manifest: general.pp
+  - name: sap
+    provisioner:
+      manifest: sap.pp
+  - name: lamp
+    provisioner:
+      manifest: lamp.pp
+  - name: tomcat
+    provisioner:
+      manifest: tomcat.pp
