@@ -13,7 +13,7 @@ syntax-lint-spec:
     - bundle exec rake spec
 
 test-kitchen-rhel-general:
-  image: paulbadcock/puppet-kitchen-docker:latest
+  image: puppet-kitchen-docker:latest
   stage: integration
   script:
     - kitchen test general-rhel
@@ -23,7 +23,7 @@ test-kitchen-rhel-general:
     - tags
 
 test-kitchen-rhel-sap:
-  image: paulbadcock/puppet-kitchen-docker:latest
+  image: puppet-kitchen-docker:latest
   stage: integration
   script:
     - kitchen test sap-rhel
@@ -33,7 +33,7 @@ test-kitchen-rhel-sap:
     - tags
 
 test-kitchen-rhel-lamp:
-  image: paulbadcock/puppet-kitchen-docker:latest
+  image: puppet-kitchen-docker:latest
   stage: integration
   script:
     - kitchen test lamp-rhel
@@ -43,7 +43,7 @@ test-kitchen-rhel-lamp:
   - tags
 
 test-kitchen-rhel-tomcat:
-  image: paulbadcock/puppet-kitchen-docker:latest
+  image: puppet-kitchen-docker:latest
   stage: integration
   script:
     - kitchen test tomcat-rhel
@@ -57,8 +57,8 @@ satellite-deployer:
   stage: deploy
   environment: production
   script:
-    - ssh-keyscan mg71.cio.gov.ns.ca | grep rsa >> ~/.ssh/known_hosts
-    - ssh jenkinsvc@mg71.cio.gov.ns.ca /usr/local/bin/build_module.sh ${CI_REPOSITORY_URL} ${CI_COMMIT_SHA} ${SATELLITE_KEY}
+    - ssh-keyscan satellite6.FQDN| grep rsa >> ~/.ssh/known_hosts
+    - ssh id@satellite6.FQDN  /usr/local/bin/build_module.sh ${CI_REPOSITORY_URL} ${CI_COMMIT_SHA} ${SATELLITE_KEY}
   only:
     - tags
 
