@@ -1,0 +1,72 @@
+stages:
+  - test
+  - integration
+  - deploy
+
+syntax-lint-spec:
+  image: ruby:2.1
+  stage: test
+  script:
+    - bundle
+    - bundle exec rake syntax
+    - bundle exec rake lint
+    - bundle exec rake spec
+
+test-kitchen-rhel-general:
+  image: paulbadcock/puppet-kitchen-docker:latest
+  stage: integration
+  script:
+    - kitchen test general-rhel
+    - kitchen destroy general-rhel
+  except:
+    - master
+    - tags
+
+test-kitchen-rhel-sap:
+  image: paulbadcock/puppet-kitchen-docker:latest
+  stage: integration
+  script:
+    - kitchen test sap-rhel
+    - kitchen destroy sap-rhel
+  except:
+    - master
+    - tags
+
+test-kitchen-rhel-lamp:
+  image: paulbadcock/puppet-kitchen-docker:latest
+  stage: integration
+  script:
+    - kitchen test lamp-rhel
+    - kitchen destroy lamp-rhel
+  except:
+  - master
+  - tags
+
+test-kitchen-rhel-tomcat:
+  image: paulbadcock/puppet-kitchen-docker:latest
+  stage: integration
+  script:
+    - kitchen test tomcat-rhel
+    - kitchen destroy tomcat-rhel
+  except:
+    - master
+    - tags
+
+satellite-deployer:
+  image: ruby:2.1
+  stage: deploy
+  environment: production
+  script:
+    - ssh-keyscan mg71.cio.gov.ns.ca | grep rsa >> ~/.ssh/known_hosts
+    - ssh jenkinsvc@mg71.cio.gov.ns.ca /usr/local/bin/build_module.sh ${CI_REPOSITORY_URL} ${CI_COMMIT_SHA} ${SATELLITE_KEY}
+  only:
+    - tags
+
+puppetenterprise-deployer:
+  image: ruby:2.1
+  stage: deploy
+  environment: production
+  script:
+    - /bin/bash /builds/puppet/icts/deploy-script.sh ${PE_DEPLOY_TOKEN} ${PE_DEPLOY_SERVER}
+  only:
+    - tags
